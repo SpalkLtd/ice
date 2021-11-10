@@ -51,8 +51,7 @@ func defaultCandidateTypes() []CandidateType {
 // AgentConfig collects the arguments to ice.Agent construction into
 // a single structure, for future-proofness of the interface
 type AgentConfig struct {
-	activeTCP bool
-	Urls      []*URL
+	Urls []*URL
 
 	// PortMin and PortMax are optional. Leave them 0 for the default UDP port allocation strategy.
 	PortMin uint16
@@ -150,6 +149,10 @@ type AgentConfig struct {
 	// Currently only passive candidates are supported. This functionality is
 	// experimental and the API might change in the future.
 	TCPMux TCPMux
+
+	// TODO Add docs
+	activeTCP         bool
+	tcpReadBufferSize int
 
 	// UDPMux is used for multiplexing multiple incoming UDP connections on a single port
 	// when this is set, the agent ignores PortMin and PortMax configurations and will
