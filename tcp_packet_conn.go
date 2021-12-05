@@ -221,6 +221,12 @@ func (t *tcpPacketConn) ReadFrom(b []byte) (n int, raddr net.Addr, err error) {
 // WriteTo is for active and s-o candidates.
 func (t *tcpPacketConn) WriteTo(buf []byte, raddr net.Addr) (n int, err error) {
 	t.mu.Lock()
+
+	t.params.Logger.Debugf("raddr: %+v", raddr)
+	if raddr == nil {
+		return 0, errors.New("raddr is nil") // TODO: what error best represnts this?
+	}
+	// FIXME: raddr.String() causes segfaults
 	conn, ok := t.conns[raddr.String()]
 	t.mu.Unlock()
 
