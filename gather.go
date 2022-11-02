@@ -239,33 +239,53 @@ func (a *Agent) gatherCandidatesLocal(ctx context.Context, networkTypes []Networ
 				}
 			}
 
-			for _, connAndPort := range conns {
+			if a.activeTCP {
 				hostConfig := CandidateHostConfig{
 					Network:   network,
 					Address:   address,
-					Port:      connAndPort.port,
+					Port:      0,
 					Component: ComponentRTP,
 					TCPType:   tcpType,
 				}
-
 				c, err := NewCandidateHost(&hostConfig)
 				if err != nil {
-					closeConnAndLog(connAndPort.conn, a.log, fmt.Sprintf("Failed to create host candidate: %s %s %d: %v", network, mappedIP, connAndPort.port, err))
-					continue
+					panic(1)
 				}
-
-				if a.mDNSMode == MulticastDNSModeQueryAndGather {
-					if err = c.setIP(ip); err != nil {
-						closeConnAndLog(connAndPort.conn, a.log, fmt.Sprintf("Failed to create host candidate: %s %s %d: %v", network, mappedIP, connAndPort.port, err))
-						continue
-					}
-				}
-
-				if err := a.addCandidate(ctx, c, connAndPort.conn); err != nil {
+				if err := a.addCandidate(ctx, c, nil); err != nil {
 					if closeErr := c.close(); closeErr != nil {
 						a.log.Warnf("Failed to close candidate: %v", closeErr)
 					}
-					a.log.Warnf("Failed to append to localCandidates and run onCandidateHdlr: %v", err)
+					panic(2)
+				}
+			} else {
+				for _, connAndPort := range conns {
+					hostConfig := CandidateHostConfig{
+						Network:   network,
+						Address:   address,
+						Port:      connAndPort.port,
+						Component: ComponentRTP,
+						TCPType:   tcpType,
+					}
+
+					c, err := NewCandidateHost(&hostConfig)
+					if err != nil {
+						closeConnAndLog(connAndPort.conn, a.log, fmt.Sprintf("Failed to create host candidate: %s %s %d: %v", network, mappedIP, connAndPort.port, err))
+						continue
+					}
+
+					if a.mDNSMode == MulticastDNSModeQueryAndGather {
+						if err = c.setIP(ip); err != nil {
+							closeConnAndLog(connAndPort.conn, a.log, fmt.Sprintf("Failed to create host candidate: %s %s %d: %v", network, mappedIP, connAndPort.port, err))
+							continue
+						}
+					}
+
+					if err := a.addCandidate(ctx, c, connAndPort.conn); err != nil {
+						if closeErr := c.close(); closeErr != nil {
+							a.log.Warnf("Failed to close candidate: %v", closeErr)
+						}
+						a.log.Warnf("Failed to append to localCandidates and run onCandidateHdlr: %v", err)
+					}
 				}
 			}
 		}

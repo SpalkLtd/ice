@@ -877,7 +877,9 @@ func (a *Agent) addCandidate(ctx context.Context, c Candidate, candidateConn net
 			}
 		}
 
-		c.start(a, candidateConn, a.startedCh)
+		if !a.activeTCP {
+			c.start(a, candidateConn, a.startedCh)
+		}
 
 		set = append(set, c)
 		a.localCandidates[c.NetworkType()] = set
