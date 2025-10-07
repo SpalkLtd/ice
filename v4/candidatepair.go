@@ -12,7 +12,6 @@ import (
 )
 
 func newCandidatePair(local, remote Candidate, controlling bool) *CandidatePair {
-	fmt.Printf("||||||||||||||||||||| New Candidate Pair Local %s Remote %s\n", local.ID(), remote.ID())
 	return &CandidatePair{
 		iceRoleControlling: controlling,
 		Remote:             remote,
