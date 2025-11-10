@@ -954,6 +954,10 @@ func TestLocalCandidateStats(t *testing.T) { //nolint:cyclop
 		if stats.IP != candidate.Address() {
 			t.Fatal("invalid stats IP")
 		}
+
+		if stats.Address != candidate.Address() {
+			t.Fatal("invalid stats Address")
+		}
 	}
 
 	if hostLocalStat.ID != hostLocal.ID() {
@@ -1065,6 +1069,10 @@ func TestRemoteCandidateStats(t *testing.T) { //nolint:cyclop
 
 		if stats.IP != candidate.Address() {
 			t.Fatal("invalid stats IP")
+		}
+
+		if stats.Address != candidate.Address() {
+			t.Fatal("invalid stats Address")
 		}
 	}
 
